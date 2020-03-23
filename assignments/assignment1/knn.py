@@ -55,7 +55,9 @@ class KNN:
         for i_test in range(num_test):
             for i_train in range(num_train):
                 # TODO: Fill dists[i_test][i_train]
-                pass
+                dists[i_test][i_train]= sum(abs(self.train_X[i_train] - X[i_test]))
+        return dists
+                #pass
 
     def compute_distances_one_loop(self, X):
         '''
@@ -73,9 +75,11 @@ class KNN:
         num_test = X.shape[0]
         dists = np.zeros((num_test, num_train), np.float32)
         for i_test in range(num_test):
+            dists[i_test] = np.sum(abs(self.train_X - X[i_test]), axis = 1)
             # TODO: Fill the whole row of dists[i_test]
             # without additional loops or list comprehensions
-            pass
+            #pass
+        return dists
 
     def compute_distances_no_loops(self, X):
         '''
@@ -94,6 +98,8 @@ class KNN:
         # Using float32 to to save memory - the default is float64
         dists = np.zeros((num_test, num_train), np.float32)
         # TODO: Implement computing all distances with no loops!
+        tensor = X.reshape(X.shape[0],1,X.shape[1])
+        return np.sum(abs(tensor - self.train_X), axis=2, dtype=np.float32)
         pass
 
     def predict_labels_binary(self, dists):
@@ -110,9 +116,21 @@ class KNN:
         '''
         num_test = dists.shape[0]
         pred = np.zeros(num_test, np.bool)
-        for i in range(num_test):
+        for i in range(num_test):            
             # TODO: Implement choosing best class based on k
             # nearest training samples
+            t = 0
+            f = 0
+            arg_of_min = np.argsort(dists[i])[:self.k]
+            for index in arg_of_min:      
+                if self.train_y[index] == True:
+                    t+=1
+                else:
+                    f+=1
+            pred[i] = True if t > f else False
+            #    pred[i] = True
+            #else:
+             #   pred[i] = False
             pass
         return pred
 

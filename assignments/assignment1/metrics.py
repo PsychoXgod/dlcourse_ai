@@ -28,7 +28,8 @@ def binary_classification_metrics(prediction, ground_truth):
         if prediction[i] == ground_truth[i] == False:
             true_negetives+= 1
         if prediction[i] == False and  prediction[i] != ground_truth[i]:
-            false_negetives+= 1    
+            false_negetives+= 1   
+    #print("True Positive: %f, False Negetive: %f" %(true_positive, false_negetives))        
     accuracy = correct / prediction.shape[0]
     precision = true_positive / (true_positive + false_positive)
     recall = true_positive / (true_positive + false_negetives)
@@ -48,9 +49,15 @@ def multiclass_accuracy(prediction, ground_truth):
     Arguments:
     prediction, np array of int (num_samples) - model predictions
     ground_truth, np array of int (num_samples) - true labels
-
+    
     Returns:
     accuracy - ratio of accurate predictions to total samples
     '''
+    correct = 0
+    for i in range(prediction.shape[0]):
+        if prediction[i] == ground_truth[i]:
+            correct+=1
+    accuracy = correct / prediction.shape[0]
+    return accuracy
     # TODO: Implement computing accuracy
     return 0

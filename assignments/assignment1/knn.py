@@ -152,5 +152,10 @@ class KNN:
         for i in range(num_test):
             # TODO: Implement choosing best class based on k
             # nearest training samples
-            pass
+            num_of_predict_labels = np.zeros(10, dtype = int)
+            arg_of_min = np.argsort(dists[i])[:self.k]
+            for minimal_vector_dists in arg_of_min:
+                num_of_predict_labels[self.train_y[minimal_vector_dists]] += 1
+            #pass
+            pred[i] = np.argmax(num_of_predict_labels)
         return pred

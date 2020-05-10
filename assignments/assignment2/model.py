@@ -1,8 +1,8 @@
 import numpy as np
 
-from layers import FullyConnectedLayer, ReLULayer, softmax_with_cross_entropy, l2_regularization
-
-
+#from layers import FullyConnectedLayer, ReLULayer, softmax_with_cross_entropy, l2_regularization
+from layers import FullyConnectedLayer, ReLULayer, l2_regularization
+from loss_function import softmax_with_cross_entropy
 class TwoLayerNet:
     """ Neural network with two fully connected layers """
 
@@ -17,8 +17,10 @@ class TwoLayerNet:
         reg, float - L2 regularization strength
         """
         self.reg = reg
+        self.first_layer = FullyConnectedLayer(n_input, hidden_layer_size)
+        self.second_layer = FullyConnectedLayer(hidden_layer_size, n_output)
         # TODO Create necessary layers
-        raise Exception("Not implemented!")
+        #raise Exception("Not implemented!")
 
     def compute_loss_and_gradients(self, X, y):
         """
@@ -33,15 +35,38 @@ class TwoLayerNet:
         # clear parameter gradients aggregated from the previous pass
         # TODO Set parameter gradient to zeros
         # Hint: using self.params() might be useful!
-        raise Exception("Not implemented!")
+        #raise Exception("Not implemented!")
+        forward_pass_of_first_layer = self.first_layer.forward(X)
+        relu_layer = ReLULayer()
+        forward_pass_of_second_layer = self.second_layer.forward(relu_layer.forward(forward_pass_of_first_layer))
         
+        loss, dpred = softmax_with_cross_entropy(forward_pass_of_second_layer, y)
+       
+        
+        backward_second_layer = self.second_layer.backward(dpred)
+        backward_relu_layer = relu_layer.backward(backward_second_layer)
+        self.first_layer.backward(backward_relu_layer)
+        
+        l2_loss_W1, l2_grad_W1 = l2_regularization(self.first_layer.W.value, self.reg)
+        l2_loss_B1, l2_grad_B1 = l2_regularization(self.first_layer.B.value, self.reg)
+        l2_loss_W2, l2_grad_W2 = l2_regularization(self.second_layer.W.value, self.reg)
+        l2_loss_B2, l2_grad_B2 = l2_regularization(self.second_layer.B.value, self.reg)
+        
+        l2 = l2_loss_W1 + l2_loss_B1 + l2_loss_W2 + l2_loss_B2
+        loss += l2
+        
+        self.first_layer.W.grad+= l2_grad_W1
+        self.first_layer.B.grad+= l2_grad_B1
+        self.second_layer.W.grad+= l2_grad_W2
+        self.second_layer.B.grad+= l2_grad_B2
         # TODO Compute loss and fill param gradients
         # by running forward and backward passes through the model
         
         # After that, implement l2 regularization on all params
         # Hint: self.params() is useful again!
-        raise Exception("Not implemented!")
-
+        #raise Exception("Not implemented!")
+    
+            
         return loss
 
     def predict(self, X):
@@ -63,10 +88,11 @@ class TwoLayerNet:
         return pred
 
     def params(self):
-        result = {}
-
+        result = {'W_first_layer': self.first_layer.W, 'B_first_layer': self.first_layer.B,
+                 'W_second_layer': self.second_layer.W, 'B_second_layer': self.second_layer.B}
+        
         # TODO Implement aggregating all of the params
 
-        raise Exception("Not implemented!")
+        #raise Exception("Not implemented!")
 
         return result

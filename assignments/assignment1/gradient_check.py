@@ -21,8 +21,9 @@ def check_gradient(f, x, delta=1e-5, tol = 1e-4):
     
     orig_x = x.copy()
     fx, analytic_grad = f(x)
+    #print(orig_x, x)
     assert np.all(np.isclose(orig_x, x, tol)), "Functions shouldn't modify input variables"
-
+    print(analytic_grad.shape, x.shape)
     assert analytic_grad.shape == x.shape
     analytic_grad = analytic_grad.copy()
 
@@ -33,7 +34,10 @@ def check_gradient(f, x, delta=1e-5, tol = 1e-4):
         ix = it.multi_index
         analytic_grad_at_ix = analytic_grad[ix]
         numeric_grad_at_ix = 0
-
+        #private deriative
+        suit_matrix = np.zeros(analytic_grad.shape)
+        suit_matrix[ix] = delta
+        numeric_grad_at_ix = (f(x + suit_matrix)[0] - f(x - suit_matrix)[0])/(2*delta)
         # TODO compute value of numeric gradient of f to idx
         if not np.isclose(numeric_grad_at_ix, analytic_grad_at_ix, tol):
             print("Gradients are different at %s. Analytic: %2.5f, Numeric: %2.5f" % (ix, analytic_grad_at_ix, numeric_grad_at_ix))

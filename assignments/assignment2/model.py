@@ -2,7 +2,7 @@ import numpy as np
 
 #from layers import FullyConnectedLayer, ReLULayer, softmax_with_cross_entropy, l2_regularization
 from layers import FullyConnectedLayer, ReLULayer, l2_regularization
-from loss_function import softmax_with_cross_entropy
+from loss_function import softmax_with_cross_entropy, softmax
 class TwoLayerNet:
     """ Neural network with two fully connected layers """
 
@@ -19,9 +19,16 @@ class TwoLayerNet:
         self.reg = reg
         self.first_layer = FullyConnectedLayer(n_input, hidden_layer_size)
         self.second_layer = FullyConnectedLayer(hidden_layer_size, n_output)
+        self.relu_layer = ReLULayer()
         # TODO Create necessary layers
         #raise Exception("Not implemented!")
-
+    
+    def _forward_pass(self, X):
+        
+        forward_pass_of_first_layer = self.first_layer.forward(X)
+        forward_pass_of_second_layer = self.second_layer.forward(self.relu_layer.forward(forward_pass_of_first_layer))
+        return forward_pass_of_first_layer, forward_pass_of_second_layer
+   
     def compute_loss_and_gradients(self, X, y):
         """
         Computes total loss and updates parameter gradients
@@ -36,16 +43,22 @@ class TwoLayerNet:
         # TODO Set parameter gradient to zeros
         # Hint: using self.params() might be useful!
         #raise Exception("Not implemented!")
-        forward_pass_of_first_layer = self.first_layer.forward(X)
-        relu_layer = ReLULayer()
-        forward_pass_of_second_layer = self.second_layer.forward(relu_layer.forward(forward_pass_of_first_layer))
+        
+        self.first_layer.W.grad = np.zeros_like(self.first_layer.W.value)
+        self.first_layer.B.grad = np.zeros_like(self.first_layer.B.value)
+        self.second_layer.W.grad = np.zeros_like(self.second_layer.W.value)
+        self.second_layer.B.grad = np.zeros_like(self.second_layer.B.value)
+        
+        
+        forward_pass_of_first_layer, forward_pass_of_second_layer = self._forward_pass(X) 
         
         loss, dpred = softmax_with_cross_entropy(forward_pass_of_second_layer, y)
        
-        
         backward_second_layer = self.second_layer.backward(dpred)
-        backward_relu_layer = relu_layer.backward(backward_second_layer)
+        backward_relu_layer = self.relu_layer.backward(backward_second_layer)
         self.first_layer.backward(backward_relu_layer)
+        
+        
         
         l2_loss_W1, l2_grad_W1 = l2_regularization(self.first_layer.W.value, self.reg)
         l2_loss_B1, l2_grad_B1 = l2_regularization(self.first_layer.B.value, self.reg)
@@ -68,7 +81,8 @@ class TwoLayerNet:
     
             
         return loss
-
+    
+        
     def predict(self, X):
         """
         Produces classifier predictions on the set
@@ -83,8 +97,8 @@ class TwoLayerNet:
         # Hint: some of the code of the compute_loss_and_gradients
         # can be reused
         pred = np.zeros(X.shape[0], np.int)
-
-        raise Exception("Not implemented!")
+        pred = np.argmax(softmax(self._forward_pass(X)[1]), axis=1)
+        #raise Exception("Not implemented!")
         return pred
 
     def params(self):

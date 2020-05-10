@@ -51,16 +51,16 @@ class Param:
         self.value = value
         self.grad = np.zeros_like(value)
 
-
+    
+    
 class ReLULayer:
     def __init__(self):
-        self.mask = None
+        self.X = None
         pass
 
     def forward(self, X):
-        self.mask = X < 0
-        result = np.copy(X)
-        result[self.mask] = 0
+        self.X = X
+        result = np.maximum(X, 0) 
         return result 
         # TODO: Implement forward pass
         # Hint: you'll need to save some information about X
@@ -80,9 +80,11 @@ class ReLULayer:
         d_result: np array (batch_size, num_features) - gradient
           with respect to input
         """
-        d_result = np.ones(d_out.shape)*d_out
-        d_result[self.mask] = 0
-        return d_result
+        #helpM =  np.copy(self.X)
+        #helpM[helpM > 0] = 1
+        #helpM[helpM < 0] = 0
+        #return helpM * d_out
+        return (self.X > 0)*d_out
         # TODO: Implement backward pass
         # Your final implementation shouldn't have any loops
         #raise Exception("Not implemented!")
@@ -92,6 +94,7 @@ class ReLULayer:
         return {}
 
 
+    
 class FullyConnectedLayer:
     def __init__(self, n_input, n_output):
         self.W = Param(0.001 * np.random.randn(n_input, n_output))
@@ -126,11 +129,11 @@ class FullyConnectedLayer:
         # It should be pretty similar to linear classifier from
         # the previous assignment
         #raise Exception("Not implemented!")
-        self.W.grad = np.dot(self.X.T, d_out)
+        self.W.grad += np.dot(self.X.T, d_out)
         #print(np.dot(self.X, self.W.value).shape, d_out.shape)
         #print(self.B.grad.shape)
         helpM = np.ones((self.B.value.shape[0], d_out.shape[0]))
-        self.B.grad = np.dot(helpM, d_out) 
+        self.B.grad += np.dot(helpM, d_out) 
         
         d_input = np.dot(d_out,self.W.value.T)
         return d_input

@@ -36,8 +36,13 @@ def softmax(predictions):
     #raise Exception("Not implemented!")
 
     '''
-    predictions -= np.max(predictions)
-    probs = np.exp(predictions) / np.sum(np.exp(predictions), axis=1, keepdims=True)
+    pred = np.copy(predictions)
+    if predictions.ndim == 1:
+        pred -= np.max(predictions)
+        probs = np.exp(pred)/np.sum(np.exp(pred))
+    else:    
+        pred -= np.max(predictions,axis=1).reshape(predictions.shape[0], -1)
+        probs = np.exp(pred) / np.sum(np.exp(pred), axis=1, keepdims=True)
     return probs 
 def cross_entropy_loss(probs, target_index):
     '''

@@ -1,6 +1,6 @@
 import numpy as np
 
-
+'''
 def l2_regularization(W, reg_strength):
     """
     Computes L2 regularization loss on weights and its gradient
@@ -18,7 +18,7 @@ def l2_regularization(W, reg_strength):
     loss = reg_strength*np.sum(W*W)
     grad = 2*reg_strength*W
     return loss, grad
-
+'''
 """
 def softmax_with_cross_entropy(preds, target_index):
     

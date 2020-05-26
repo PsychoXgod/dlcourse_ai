@@ -1,8 +1,8 @@
 import numpy as np
 
 #from layers import FullyConnectedLayer, ReLULayer, softmax_with_cross_entropy, l2_regularization
-from layers import FullyConnectedLayer, ReLULayer, l2_regularization
-from loss_function import softmax_with_cross_entropy, softmax
+from layers import FullyConnectedLayer, ReLULayer
+from loss_function import softmax_with_cross_entropy, softmax, l2_regularization
 class TwoLayerNet:
     """ Neural network with two fully connected layers """
 
@@ -26,7 +26,8 @@ class TwoLayerNet:
     def _forward_pass(self, X):
         
         forward_pass_of_first_layer = self.first_layer.forward(X)
-        forward_pass_of_second_layer = self.second_layer.forward(self.relu_layer.forward(forward_pass_of_first_layer))
+        ReLU = self.relu_layer.forward(forward_pass_of_first_layer)
+        forward_pass_of_second_layer = self.second_layer.forward(ReLU)
         return forward_pass_of_first_layer, forward_pass_of_second_layer
    
     def compute_loss_and_gradients(self, X, y):

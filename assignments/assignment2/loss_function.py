@@ -12,9 +12,13 @@ def softmax(predictions):
       probs, np array of the same shape as predictions - 
         probability for every class, 0..1
     '''
-    predictions -= np.max(predictions)
-    array_exp = np.exp(predictions)
-    probs = array_exp / np.sum(array_exp, axis=1, keepdims=True)
+    pred = np.copy(predictions)
+    if predictions.ndim == 1:
+        pred -= np.max(predictions)
+        probs = np.exp(pred)/np.sum(np.exp(pred))
+    else:    
+        pred -= np.max(predictions,axis=1).reshape(predictions.shape[0], -1)
+        probs = np.exp(pred) / np.sum(np.exp(pred), axis=1, keepdims=True)
     return probs 
     # TODO implement softmax
     # Your final implementation shouldn't have any loops
@@ -72,3 +76,21 @@ def softmax_with_cross_entropy(predictions, target_index):
     
 
     return loss, dprediction
+
+def l2_regularization(W, reg_strength):
+    """
+    Computes L2 regularization loss on weights and its gradient
+
+    Arguments:
+      W, np array - weights
+      reg_strength - float value
+
+    Returns:
+      loss, single value - l2 regularization loss
+      gradient, np.array same shape as W - gradient of weight by l2 loss
+    """
+    # TODO: Copy from the previous assignment
+    #raise Exception("Not implemented!")
+    loss = reg_strength*np.sum(W*W)
+    grad = 2*reg_strength*W
+    return loss, grad
